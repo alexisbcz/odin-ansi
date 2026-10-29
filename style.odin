@@ -232,14 +232,16 @@ write_cell :: proc(w: ^Writer, text: string, width, pad_left, pad_right: int, al
 		write_blank(w, width - used + pad_right, bg, profile)
 		return
 	}
+	if text == "" {
+		write_blank(w, pad_left + width + pad_right, bg, profile)
+		return
+	}
 	left, right := gaps(text_w, width, align)
 	write_blank(w, pad_left + left, bg, profile)
-	if text != "" {
-		opened := write_sgr(w, fg, bg, attrs, profile)
-		write_str(w, text)
-		if opened {
-			write_str(w, RESET)
-		}
+	opened := write_sgr(w, fg, bg, attrs, profile)
+	write_str(w, text)
+	if opened {
+		write_str(w, RESET)
 	}
 	write_blank(w, right + pad_right, bg, profile)
 }
