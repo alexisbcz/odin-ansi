@@ -228,3 +228,29 @@ test_expand_tabs_frees_buffer_when_growth_fails :: proc(t: ^testing.T) {
 	_, err := ansistyle.expand_tabs("\t\t\t\t", 8, limited_allocator(&l))
 	testing.expect_value(t, err, OUT_OF_MEMORY)
 }
+
+@(test)
+test_display_width_skips_nf_escape_sequences :: proc(t: ^testing.T) {
+	// `tput sgr0` on xterm prints ESC ( B before the SGR reset.
+	testing.expect_value(t, ansistyle.display_width("\x1b(Bab\x1b[m"), 2)
+	testing.expect_value(t, ansistyle.display_width("\x1b#8ab"), 2)
+	testing.expect_value(t, ansistyle.display_width("\x1b)0\x1b(0ab"), 2)
+}
+
+@(test)
+test_lone_escape_keeps_the_next_line_break :: proc(t: ^testing.T) {
+	testing.expect_value(t, ansistyle.display_width("ab\x1b\ncd"), 2)
+	testing.expect_value(t, ansistyle.display_width("\x1b(\nab"), 2)
+}
+
+@(test)
+test_strip_removes_nf_escape_sequences :: proc(t: ^testing.T) {
+	tr: mem.Tracking_Allocator
+	context.allocator = track_begin(&tr)
+	defer track_end(t, &tr)
+
+	out, err := ansistyle.strip("\x1b(Bab\x1b[m\x1b#8c")
+	defer delete(out)
+	testing.expect_value(t, err, nil)
+	testing.expect_value(t, out, "abc")
+}

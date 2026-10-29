@@ -44,10 +44,18 @@ escape_len :: proc(s: string) -> int {
 		}
 		return len(s)
 	case:
-		if s[1] < 0x80 {
-			return 2
+		// nF sequences such as ESC ( B take intermediate bytes before the
+		// final byte; Fp, Fe and Fs sequences such as ESC 7 have only the final.
+		j := 1
+		for j < len(s) && s[j] >= 0x20 && s[j] <= 0x2f {
+			j += 1
 		}
-		return 1
+		if j < len(s) && s[j] >= 0x30 && s[j] <= 0x7e {
+			return j + 1
+		}
+		// Malformed: stop before a control character or non-ASCII byte, so a
+		// stray ESC never swallows a line break or visible text.
+		return j
 	}
 }
 
