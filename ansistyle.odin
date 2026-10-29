@@ -1,5 +1,9 @@
 /*
-Package ansi styles and lays out text for terminals, in the spirit of Go's lipgloss.
+Package ansistyle styles and lays out text for terminals, in the spirit of Go's lipgloss.
+
+The package lives in the `odin-ansi` repository. It isn't called `ansi`
+because `core:terminal/ansi` already uses that name, and Odin requires package
+names to be unique within a program that imports `core:log` or `core:testing`.
 
 It covers four jobs:
 
@@ -18,17 +22,18 @@ that the caller owns. The package keeps no global mutable state.
 Example:
 	import "core:fmt"
 	import "core:os"
-	import ansi "shared:ansi"
+	import "shared:ansistyle"
 
 	main :: proc() {
-		profile := ansi.detect_profile(os.stdout)
-		style := ansi.Style{
-			fg      = ansi.Basic_Color.Bright_Cyan,
+		ansistyle.enable_virtual_terminal(os.stdout)
+		profile := ansistyle.detect_profile(os.stdout)
+		style := ansistyle.Style{
+			fg      = ansistyle.Basic_Color.Bright_Cyan,
 			attrs   = {.Bold},
-			padding = ansi.spacing(0, 1),
-			border  = ansi.ROUNDED_BORDER,
+			padding = ansistyle.spacing(0, 1),
+			border  = ansistyle.ROUNDED_BORDER,
 		}
-		box, err := ansi.render(style, "hello, terminal", profile)
+		box, err := ansistyle.render(style, "hello, terminal", profile)
 		if err != nil {
 			return
 		}
@@ -36,7 +41,7 @@ Example:
 		fmt.println(box)
 	}
 */
-package ansi
+package ansistyle
 
 import "base:runtime"
 
@@ -77,7 +82,7 @@ Layout_Error :: enum {
 /*
 Error is the compound error type returned by every fallible procedure in this
 package. `nil` means success. Compare it against a specific variant, for
-example `ansi.Error(ansi.Color_Error.Invalid_Hex_Digit)`, or use a type switch.
+example `ansistyle.Error(ansistyle.Color_Error.Invalid_Hex_Digit)`, or use a type switch.
 */
 Error :: union #shared_nil {
 	Color_Error,

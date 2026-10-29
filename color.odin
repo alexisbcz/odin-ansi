@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 /*
 Basic_Color is one of the 16 colors that every color terminal supports. The

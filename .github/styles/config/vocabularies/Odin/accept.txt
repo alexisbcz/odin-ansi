@@ -77,3 +77,4 @@ WebAssembly
 WebSocket(s)?
 Xcode
 XCTest
+ansistyle

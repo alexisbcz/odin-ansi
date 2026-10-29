@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 import "base:runtime"
 import "core:strconv"
@@ -65,7 +65,7 @@ write_repeat :: proc(w: ^Writer, s: string, cells: int) {
 }
 
 // writer_finish hands the buffer to the caller as a string, or frees it and
-// reports the first allocation failure.
+// reports the first allocation failure. An empty result is returned as "".
 @(private)
 writer_finish :: proc(w: ^Writer) -> (out: string, err: Error) {
 	if w.err != nil {
@@ -73,6 +73,12 @@ writer_finish :: proc(w: ^Writer) -> (out: string, err: Error) {
 		delete(w.buf)
 		w^ = {}
 		return "", failure
+	}
+	if len(w.buf) == 0 {
+		// Empty results own no memory, so `delete` on them is always a no-op.
+		delete(w.buf)
+		w^ = {}
+		return "", nil
 	}
 	return string(w.buf[:]), nil
 }

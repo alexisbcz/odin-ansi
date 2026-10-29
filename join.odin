@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 /*
 join_horizontal places blocks side by side, left to right. Each block is padded

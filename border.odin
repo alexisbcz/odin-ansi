@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 /*
 Border is the set of strings that draw a box. Each string should be one

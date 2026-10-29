@@ -11,6 +11,7 @@
 /basic
 /tests.bin
 /odin-ansi
+/ansistyle
 /table
 
 # Vale packages downloaded by `vale sync`; keep the house style and vocabulary

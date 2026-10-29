@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 // Attribute is a text effect that terminals turn on with an SGR code.
 Attribute :: enum u8 {

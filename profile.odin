@@ -1,8 +1,7 @@
-package ansi
+package ansistyle
 
 import "core:os"
 import "core:strings"
-import "core:terminal"
 
 /*
 Profile says how much styling an output can show. The members are ordered, so
@@ -35,7 +34,7 @@ Environment :: struct {
 	colorterm:   string,
 	// The value of `NO_COLOR`. Any non-empty value disables colors.
 	no_color:    string,
-	// The value of `FORCE_COLOR`, or `CLICOLOR_FORCE` when the former is unset.
+	// The value of `FORCE_COLOR`, or of `CLICOLOR_FORCE` when the former is unset or empty.
 	force_color: string,
 }
 
@@ -99,8 +98,8 @@ detect_profile reads `NO_COLOR`, `FORCE_COLOR`, `CLICOLOR_FORCE`, `TERM` and
 and applies profile_from_environment. A `nil` file counts as not a terminal.
 
 On Windows, where `TERM` is usually unset, a console counts as `.ANSI_256`,
-or `.True_Color` inside Windows Terminal. Importing this package also lets
-`core:terminal` turn on escape sequence processing for the Windows console.
+or `.True_Color` inside Windows Terminal. Call enable_virtual_terminal first
+so that the console interprets the escape sequences.
 
 It does not allocate.
 */
@@ -112,13 +111,12 @@ detect_profile :: proc(f: ^os.File) -> Profile {
 	}
 
 	env: Environment
-	env.is_tty = f != nil && terminal.is_terminal(f)
+	env.is_tty = f != nil && os.is_tty(f)
 	env.term, _ = lookup(bufs[0][:], "TERM")
 	env.colorterm, _ = lookup(bufs[1][:], "COLORTERM")
 	env.no_color, _ = lookup(bufs[2][:], "NO_COLOR")
-	found: bool
-	env.force_color, found = lookup(bufs[3][:], "FORCE_COLOR")
-	if !found {
+	env.force_color, _ = lookup(bufs[3][:], "FORCE_COLOR")
+	if env.force_color == "" {
 		env.force_color, _ = lookup(bufs[4][:], "CLICOLOR_FORCE")
 	}
 
@@ -132,4 +130,19 @@ detect_profile :: proc(f: ^os.File) -> Profile {
 		}
 	}
 	return profile_from_environment(env)
+}
+
+/*
+enable_virtual_terminal asks the console behind `f` to interpret escape
+sequences and reports whether it will. On Windows it turns on
+`ENABLE_VIRTUAL_TERMINAL_PROCESSING` for the console and leaves it on; call it
+once at startup, before printing styled text. On other systems terminals
+always interpret escape sequences, so it only reports whether `f` is a
+terminal. A `nil` file gives false.
+*/
+enable_virtual_terminal :: proc(f: ^os.File) -> bool {
+	if f == nil || !os.is_tty(f) {
+		return false
+	}
+	return _enable_virtual_terminal(f)
 }

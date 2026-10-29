@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 import "core:strings"
 import "core:unicode/utf8"

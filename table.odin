@@ -1,4 +1,4 @@
-package ansi
+package ansistyle
 
 /*
 Table describes a grid of text cells for table_render. It borrows every slice
