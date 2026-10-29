@@ -78,3 +78,6 @@ WebSocket(s)?
 Xcode
 XCTest
 ansistyle
+[Dd]ownsampl(e|es|ed|ing)
+lipgloss
+[Ss]trikethrough(s)?

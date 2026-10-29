@@ -20,17 +20,18 @@ All three must pass with zero errors.
 - Give every allocating procedure an `allocator := context.allocator` parameter and a matching destroy or delete procedure.
 - Return `(T, Error)` from fallible procedures. Don't panic in library code.
 - Write a doc comment for every exported declaration.
-- Add a test under `tests/` for every bug fix and every new procedure.
+- Add a test under `tests/` for every bug fix and every new procedure. Allocating tests use the tracking allocator helpers in `tests/helpers.odin`.
+- Compare exact output strings, escape sequences included, so changes to the rendering show up in review.
 
 ## Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Write an imperative subject of 72 characters or fewer, a blank line, then a body of `-` bullet points that explain what changed and why:
 
 ```text
-fix: reject negative counts in repeat
+fix: keep wide characters whole when truncating
 
-- repeat used to allocate a huge buffer when count was negative
-- return Repeat_Error.Negative_Count before touching the allocator
+- truncate used to count bytes, so it could cut a CJK glyph in half
+- measure each grapheme cluster with core:unicode/utf8 before writing it
 ```
 
 ## Changelog
