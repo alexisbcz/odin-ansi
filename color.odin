@@ -164,7 +164,7 @@ command-line flag. It accepts three forms:
 - a hex color that starts with `#`, as accepted by parse_hex.
 
 Returns:
-- c: the parsed color; never `nil` on success.
+- c: the parsed color; never `nil` on success and always `nil` on failure.
 - err: `.Empty`, `.Index_Out_Of_Range`, `.Unknown_Name` or a parse_hex error.
 */
 parse_color :: proc "contextless" (s: string) -> (c: Color, err: Error) {
@@ -172,7 +172,8 @@ parse_color :: proc "contextless" (s: string) -> (c: Color, err: Error) {
 		return nil, .Empty
 	}
 	if s[0] == '#' {
-		return parse_hex(s)
+		value := parse_hex(s) or_return
+		return value, nil
 	}
 
 	all_digits := true

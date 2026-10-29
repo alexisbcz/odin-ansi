@@ -196,3 +196,12 @@ test_color_convert_never_upsamples_basic :: proc(t: ^testing.T) {
 		testing.expect_value(t, ansistyle.color_convert(ansistyle.Basic_Color.Cyan, profile), ansistyle.Color(ansistyle.Basic_Color.Cyan))
 	}
 }
+
+@(test)
+test_parse_color_returns_nil_on_hex_error :: proc(t: ^testing.T) {
+	for input in ([]string{"#", "#12", "#12345z"}) {
+		c, err := ansistyle.parse_color(input)
+		testing.expectf(t, err != nil, "%q gave no error", input)
+		testing.expectf(t, c == nil, "%q gave %v instead of nil", input, c)
+	}
+}
