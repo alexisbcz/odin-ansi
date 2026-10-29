@@ -88,6 +88,7 @@ Style :: struct {
 	// Minimum width inside the border, padding included. 0 means "fit the text".
 	width:     int,
 	// Maximum width inside the border, padding included. 0 means no limit.
+	// Padding that alone exceeds it shrinks, right side first.
 	max_width: int,
 	// Space between the text and the border.
 	padding:   Spacing,
@@ -273,6 +274,17 @@ render :: proc(style: Style, text: string, profile: Profile, allocator := contex
 	validate_spacing(style.padding, .Negative_Padding) or_return
 	validate_spacing(style.margin, .Negative_Margin) or_return
 
+	// Padding wider than max_width shrinks, right side first, so the block
+	// never grows past the limit.
+	style := style
+	if style.max_width > 0 {
+		excess := style.padding.left + style.padding.right - style.max_width
+		if excess > 0 {
+			from_right := min(excess, style.padding.right)
+			style.padding.right -= from_right
+			style.padding.left -= excess - from_right
+		}
+	}
 	p, m, b := style.padding, style.margin, style.border
 	content_w := max(display_width(text), style.width - p.left - p.right)
 	if style.max_width > 0 {

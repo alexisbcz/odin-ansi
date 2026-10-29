@@ -265,3 +265,20 @@ test_spacing_shorthands :: proc(t: ^testing.T) {
 	testing.expect_value(t, ansistyle.spacing(1, 3), ansistyle.Spacing{1, 3, 1, 3})
 	testing.expect_value(t, ansistyle.spacing(1, 2, 3, 4), ansistyle.Spacing{top = 1, right = 2, bottom = 3, left = 4})
 }
+
+@(test)
+test_render_max_width_caps_padding :: proc(t: ^testing.T) {
+	tr: mem.Tracking_Allocator
+	context.allocator = track_begin(&tr)
+	defer track_end(t, &tr)
+
+	// Padding wider than max_width shrinks, right side first, so the block
+	// never grows past the limit.
+	expect_render(t, {max_width = 4, padding = ansistyle.spacing(0, 3)}, "hello", .Plain, "    ")
+	expect_render(t, {max_width = 5, padding = ansistyle.spacing(0, 3)}, "hello", .Plain, "     ")
+	expect_render(t, {max_width = 2, padding = {left = 1, right = 3}}, "x", .Plain, "  ")
+	box, err := ansistyle.render({max_width = 4, padding = ansistyle.spacing(0, 3), border = ansistyle.NORMAL_BORDER}, "hello", .Plain)
+	defer delete(box)
+	testing.expect_value(t, err, nil)
+	testing.expect_value(t, ansistyle.display_width(box), 6)
+}
