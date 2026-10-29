@@ -95,7 +95,7 @@ A `Profile` says what an output can show: `.Plain`, `.No_Color`, `.ANSI_16`, `.A
 `detect_profile` follows these rules:
 
 - Output that isn't a terminal, or `TERM=dumb`, gets `.Plain`: layout but no escape sequences.
-- `COLORTERM=truecolor` or `24bit` gives true color, and a `TERM` that ends in `256color` gives 256 colors.
+- `COLORTERM=truecolor` or `24bit` gives true color, and a `TERM` that contains `256color` gives 256 colors.
 - A non-empty `NO_COLOR` keeps attributes such as bold but drops every color, as [no-color.org](https://no-color.org) asks.
 - `FORCE_COLOR` or `CLICOLOR_FORCE` turns styling on for pipes. The values `2` and `3` ask for 256 colors and true color.
 

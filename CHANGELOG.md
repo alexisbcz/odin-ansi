@@ -6,6 +6,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-29
+
+### Fixed
+
+- `display_width`, `strip`, `truncate` and the layout procedures now skip whole nF escape sequences such as `ESC ( B`, which `tput sgr0` prints, instead of counting their last byte as visible text.
+- A stray `ESC` before a line break or other control character no longer swallows that character.
+- `render` now shrinks padding that alone is wider than `max_width`, so the block never grows past the limit.
+- `parse_color` now returns a `nil` color when a hex color fails to parse, instead of black.
+
 ## [0.1.0] - 2026-10-29
 
 ### Added
@@ -22,5 +31,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - `join_horizontal` and `join_vertical` to combine rendered blocks.
 - `sgr` to build an opening escape sequence by hand.
 
-[Unreleased]: https://github.com/alexisbcz/odin-ansi/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/alexisbcz/odin-ansi/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/alexisbcz/odin-ansi/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alexisbcz/odin-ansi/releases/tag/v0.1.0
